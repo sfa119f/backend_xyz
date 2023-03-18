@@ -9,7 +9,7 @@ type Customer struct {
 	Fullname	string	`json:"fullname"`
 	Email			string	`json:"email"`
 	Pass			string	`json:"pass"`
-	Salary		int	`json:"salary"`
+	Salary		int			`json:"salary"`
 }
 
 func (customer *Customer) HashPassword(password string) error {

@@ -21,7 +21,8 @@ func main() {
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello World!")
 	}).Methods(http.MethodGet)
-	router.HandleFunc("/customer", handler.InsertCustomer).Methods(http.MethodPost)
+	router.HandleFunc("/api/customer", handler.InsertCustomer).Methods(http.MethodPost)
+	router.HandleFunc("/api/login", handler.Login).Methods(http.MethodPost)
 
 	http.ListenAndServe(":8000", router)
 }

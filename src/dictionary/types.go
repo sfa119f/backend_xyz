@@ -1,10 +1,11 @@
 package dictionary
 
 const (
-	UndisclosedError	= "Something went wrong"
-	NoError				= "None"
-	NotFoundError		= "Not found"
-	InvalidParamError	= "Invalid parameter"
+	UndisclosedError		= "something went wrong"
+	NoError							= "none"
+	NotFoundError				= "not found"
+	InvalidParamError		= "invalid parameter"
+	InvalidRequestError	= "invalid request"
 )
 
 type APIResponse struct {

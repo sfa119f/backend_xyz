@@ -24,7 +24,7 @@ func InitDB() {
 	var (
 		err error
 	)
-	port_int, _ := strconv.ParseInt(port, 10, 64)
+	port_int, _ := strconv.Atoi(port)
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port_int, user, password, dbname)
