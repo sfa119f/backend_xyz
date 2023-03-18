@@ -4,16 +4,19 @@ import (
 	"encoding/json"
 	"net/http"
 	"errors"
-	"strconv"
+	"os"
+	"time"
 
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 	"github.com/sfa119f/backend_xyz/src/service"
 	"github.com/sfa119f/backend_xyz/src/utils"
+	
+	jwt "github.com/golang-jwt/jwt/v4"
+	_		"github.com/joho/godotenv/autoload"
 )
 
 func InsertCustomer(w http.ResponseWriter, r *http.Request) {
 	customer := dictionary.Customer{}
-	
 	if err := json.NewDecoder(r.Body).Decode(&customer); err != nil {
 		utils.JsonResp(w, 500, nil, err)
 		return
@@ -43,25 +46,8 @@ func InsertCustomer(w http.ResponseWriter, r *http.Request) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	token := ""
-	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
-		utils.JsonResp(w, 500, nil, err)
-		return
-	}
-
-	if token == "" {
-		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidRequestError))
-		return
-	}
-
-	reqByte, err := utils.DecryptAES(token)
-	if err != nil {
-		utils.JsonResp(w, 500, nil, err)
-		return
-	}
-
 	customer := dictionary.Customer{}
-	if err := json.Unmarshal(reqByte, &customer); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&customer); err != nil {
 		utils.JsonResp(w, 500, nil, err)
 		return
 	}
@@ -70,7 +56,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	resDB, err := service.Login(customer.Email)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			utils.JsonResp(w, 400, nil, errors.New(dictionary.NotFoundError))
+			utils.JsonResp(w, 400, nil, errors.New("invalid username or password"))
 		} else {
 			utils.JsonResp(w, 500, nil, err)
 		}
@@ -79,32 +65,34 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	
 	if err := resDB.CheckPassword(customer.Pass); err != nil {
 		if err.Error() == "crypto/bcrypt: hashedPassword is not the hash of the given password" {
-			utils.JsonResp(w, 400, nil, errors.New(dictionary.NotFoundError))
+			utils.JsonResp(w, 400, nil, errors.New("invalid username or password"))
 		} else {
 			utils.JsonResp(w, 500, nil, err)
 		}
 		return
 	}
 
-	mapTokenRes := map[string]string{"id": strconv.Itoa(resDB.Id)}
-	strTokenRes, err := json.Marshal(mapTokenRes)
-	if err != nil {
-		utils.JsonResp(w, 500, nil, err)
-		return
+	appName := os.Getenv("APP_NAME")
+	claims := dictionary.JwtClaims{
+    StandardClaims: jwt.StandardClaims{
+			Issuer: appName,
+			ExpiresAt: time.Now().Add(time.Duration(10) * time.Minute).Unix(),
+    },
+    Id: resDB.Id,
+    Fullname: resDB.Fullname,
+    Email: resDB.Email,
 	}
-	
-	tokenRes, err := utils.EncryptAES(strTokenRes)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	strKey := os.Getenv("XYZ_SECRET_KEY")
+	key := []byte(strKey)
+
+	signedToken, err := token.SignedString(key)
 	if err != nil {
-		utils.JsonResp(w, 500, nil, err)
+		utils.JsonResp(w, 400, nil, err)
 		return
-	}
-	
-	mapResult := map[string]string{
-		"token": tokenRes,
-		"email": resDB.Email,
-		"fullname": resDB.Fullname,
 	}
 
 	// Success
-	utils.JsonResp(w, 200, mapResult, nil)
+	utils.JsonResp(w, 200, map[string]interface{}{"token": signedToken}, nil)
 }

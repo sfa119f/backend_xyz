@@ -7,16 +7,15 @@ import (
 
 func InsertCustomer(customer dictionary.Customer) error {
 	db := database.GetDB()
-	query := `insert into customers (fullname, email, pass, salary) values ($1, $2, $3, $4)`
+	query := `insert into customers (fullname, email, pass) values ($1, $2, $3)`
 
-	_, err := db.Exec(query, customer.Fullname, customer.Email, customer.Pass, customer.Salary)
-
+	_, err := db.Exec(query, customer.Fullname, customer.Email, customer.Pass)
 	return err
 }
 
 func Login(email string) (dictionary.Customer, error) {
 	db := database.GetDB()
-	query := `select id, fullname, email, pass from customers where email = $1`
+	query := `select * from customers where email = $1`
 
 	res := dictionary.Customer{}
 	if err := 
