@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/sfa119f/backend_xyz/src/database"
+	"github.com/sfa119f/backend_xyz/src/handler"
 
 	"github.com/gorilla/mux"
 )
@@ -20,6 +21,7 @@ func main() {
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello World!")
 	}).Methods(http.MethodGet)
+	router.HandleFunc("/customer", handler.InsertCustomer).Methods(http.MethodPost)
 
 	http.ListenAndServe(":8000", router)
 }
