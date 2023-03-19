@@ -59,6 +59,16 @@ func MiddlewareJWTAuthorization(next http.Handler) http.Handler {
 	})
 }
 
+func GetIdCustomerInfoCtx(w http.ResponseWriter, r *http.Request) int64 {
+	customerInfo := r.Context().Value("customerInfo").(jwt.MapClaims)
+	idFloat, ok := customerInfo["id"].(float64)
+	if !ok {
+		JsonResp(w, 500, nil, errors.New(dictionary.UndisclosedError))
+		return int64(0)
+	}
+	return int64(idFloat)
+}
+
 func MakeToken(customer dictionary.Customer) (string, error) {
 	appName := os.Getenv("APP_NAME")
 	claims := dictionary.JwtClaims{

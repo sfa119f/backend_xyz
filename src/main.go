@@ -42,6 +42,7 @@ func main() {
 	r_um.Use(utils.MiddlewareJWTAuthorization)
 	r_um.HandleFunc("/customer", handler.UpdateCstExceptPass).Methods(http.MethodPut)
 	r_um.HandleFunc("/customer/password", handler.UpdateCstPass).Methods(http.MethodPut)
+	r_um.HandleFunc("/customer/details", handler.InsertUpdateCstDetails).Methods(http.MethodPost)
 	
 	port :=  ":" + os.Getenv("XYZ_PORT")
 	server := new(http.Server)

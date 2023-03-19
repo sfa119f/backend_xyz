@@ -55,3 +55,21 @@ func UpdateCustomer(customer dictionary.Customer) error {
 		}
 	return nil
 }
+
+func InsertUpdateCstDetails(cstDetails dictionary.CustomerDetail) error {
+	db := database.GetDB()
+	query := `
+		insert into customer_details 
+		(id, nik, legalname, place_of_birth, date_of_birth, salary, ktp_img, selfie_img) 
+		values ($1, $2, $3, $4, $5, $6, $7, $8)
+		on conflict (id) do update set (nik, legalname, place_of_birth, date_of_birth, 
+			salary, ktp_img, selfie_img) = (excluded.nik, excluded.legalname, excluded.place_of_birth, 
+			excluded.date_of_birth, excluded.salary, excluded.ktp_img, excluded.selfie_img)
+	`
+
+	_, err := db.Exec(
+		query, cstDetails.Id, cstDetails.NIK, cstDetails.LegalName, cstDetails.PlaceBirth,
+		cstDetails.DateBirth, cstDetails.Salary, cstDetails.KtpImg, cstDetails.SelfieImg,
+	)
+	return err
+}

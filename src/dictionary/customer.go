@@ -11,6 +11,17 @@ type Customer struct {
 	Pass			string	`json:"pass"`
 }
 
+type CustomerDetail struct {
+	Id					int64		`json:"id"`
+	NIK					string	`json:"nik"`
+	LegalName		string	`json:"legalname"`
+	PlaceBirth	string 	`json:"placeBirth"`
+	DateBirth		string	`json:"dateBirth"`
+	Salary			int64		`json:"salary"`
+	KtpImg			string  `json:"ktpImg"`
+	SelfieImg		string	`json:"selfieImg"`
+}
+
 func (customer *Customer) HashPassword(password string) error {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {

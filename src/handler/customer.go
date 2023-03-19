@@ -8,9 +8,6 @@ import (
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 	"github.com/sfa119f/backend_xyz/src/service"
 	"github.com/sfa119f/backend_xyz/src/utils"
-	
-	jwt "github.com/golang-jwt/jwt/v4"
-	_		"github.com/joho/godotenv/autoload"
 )
 
 func InsertCustomer(w http.ResponseWriter, r *http.Request) {
@@ -131,13 +128,7 @@ func UpdateCstExceptPass(w http.ResponseWriter, r *http.Request) {
 func UpdateCustomer(
 	w http.ResponseWriter, r *http.Request, dataUpdate dictionary.Customer, oldPass string,
 ) {
-	customerInfo := r.Context().Value("customerInfo").(jwt.MapClaims)
-	idFloat, ok := customerInfo["id"].(float64)
-	if !ok {
-		utils.JsonResp(w, 500, nil, errors.New(dictionary.UndisclosedError))
-	}
-	dataUpdate.Id = int64(idFloat)
-
+	dataUpdate.Id = utils.GetIdCustomerInfoCtx(w, r)
 	if dataUpdate.Id == 0 || oldPass == "" {
 		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidRequestError))
 		return
@@ -181,6 +172,35 @@ func UpdateCustomer(
 
 	if err := service.UpdateCustomer(dataUpdate); err != nil {
 		utils.JsonResp(w, 500, nil, err)
+		return
+	}
+
+	// Success
+	utils.JsonResp(w, 200, map[string]string{"message": "success"}, nil)
+}
+
+func InsertUpdateCstDetails(w http.ResponseWriter, r *http.Request) {
+	cstDetails := dictionary.CustomerDetail{}
+	if err := json.NewDecoder(r.Body).Decode(&cstDetails); err != nil {
+		utils.JsonResp(w, 500, nil, err)
+		return
+	}
+	cstDetails.Id = utils.GetIdCustomerInfoCtx(w, r)
+
+	if (cstDetails.Id == 0 || cstDetails.NIK == "" || cstDetails.LegalName == "" || 
+		cstDetails.PlaceBirth == "" || cstDetails.DateBirth == "" || 
+		cstDetails.KtpImg == "" || cstDetails.SelfieImg == "" ){
+		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidRequestError))
+		return
+	}
+
+	err := service.InsertUpdateCstDetails(cstDetails)
+	if err != nil {
+		if err.Error() == `pq: duplicate key value violates unique constraint "customer_details_nik_key"` {
+			utils.JsonResp(w, 400, nil, errors.New("NIK already registered"))
+		} else {
+			utils.JsonResp(w, 500, nil, err)
+		}
 		return
 	}
 
