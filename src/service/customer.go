@@ -5,12 +5,16 @@ import (
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 )
 
-func InsertCustomer(customer dictionary.Customer) error {
+func InsertCustomer(customer dictionary.Customer) (int64, error) {
 	db := database.GetDB()
-	query := `insert into customers (fullname, email, pass) values ($1, $2, $3)`
+	query := `insert into customers (fullname, email, pass) values ($1, $2, $3) returning id`
 
-	_, err := db.Exec(query, customer.Fullname, customer.Email, customer.Pass)
-	return err
+	var id int64
+	if err := db.QueryRow(query, customer.Fullname, customer.Email, customer.Pass).Scan(&id);
+	err != nil {
+		return 0, err
+	}
+	return id, nil
 }
 
 func Login(id int64, email string) (dictionary.Customer, error) {

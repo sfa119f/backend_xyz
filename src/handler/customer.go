@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"errors"
-	"os"
-	"time"
 
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 	"github.com/sfa119f/backend_xyz/src/service"
@@ -32,7 +30,8 @@ func InsertCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := service.InsertCustomer(customer); err != nil {
+	id, err := service.InsertCustomer(customer)
+	if err != nil {
 		if err.Error() == `pq: duplicate key value violates unique constraint "customers_email_key"` {
 			utils.JsonResp(w, 400, nil, errors.New("email already registered"))
 		} else {
@@ -41,8 +40,15 @@ func InsertCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	customer.Id = id
+	signedToken, err := utils.MakeToken(customer)
+	if err != nil {
+		utils.JsonResp(w, 400, nil, err)
+		return
+	}
+
 	// Success
-	utils.JsonResp(w, 200, map[string]string{"message": "success"}, nil)
+	utils.JsonResp(w, 200, map[string]interface{}{"token": signedToken}, nil)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -72,22 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appName := os.Getenv("APP_NAME")
-	claims := dictionary.JwtClaims{
-    StandardClaims: jwt.StandardClaims{
-			Issuer: appName,
-			ExpiresAt: time.Now().Add(time.Duration(10) * time.Minute).Unix(),
-    },
-    Id: resDB.Id,
-    Fullname: resDB.Fullname,
-    Email: resDB.Email,
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	strKey := os.Getenv("XYZ_SECRET_KEY")
-	key := []byte(strKey)
-
-	signedToken, err := token.SignedString(key)
+	signedToken, err := utils.MakeToken(resDB)
 	if err != nil {
 		utils.JsonResp(w, 400, nil, err)
 		return

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"errors"
 	"os"
+	"time"
 
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 	
@@ -56,6 +57,26 @@ func MiddlewareJWTAuthorization(next http.Handler) http.Handler {
 		
 		next.ServeHTTP(w, r)
 	})
+}
+
+func MakeToken(customer dictionary.Customer) (string, error) {
+	appName := os.Getenv("APP_NAME")
+	claims := dictionary.JwtClaims{
+    StandardClaims: jwt.StandardClaims{
+			Issuer: appName,
+			ExpiresAt: time.Now().Add(time.Duration(10) * time.Minute).Unix(),
+    },
+    Id: customer.Id,
+    Fullname: customer.Fullname,
+    Email: customer.Email,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	strKey := os.Getenv("XYZ_SECRET_KEY")
+	key := []byte(strKey)
+	signedToken, err := token.SignedString(key)
+
+	return signedToken, err
 }
 
 func JsonResp(w http.ResponseWriter, code int, data interface{}, err error) {
