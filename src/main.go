@@ -43,6 +43,7 @@ func main() {
 	r_um.HandleFunc("/customer", handler.UpdateCstExceptPass).Methods(http.MethodPut)
 	r_um.HandleFunc("/customer/password", handler.UpdateCstPass).Methods(http.MethodPut)
 	r_um.HandleFunc("/customer/details", handler.InsertUpdateCstDetails).Methods(http.MethodPost)
+	r_um.HandleFunc("/tenorLimit", handler.GetTenorByIdCust).Methods(http.MethodGet)
 	
 	port :=  ":" + os.Getenv("XYZ_PORT")
 	server := new(http.Server)

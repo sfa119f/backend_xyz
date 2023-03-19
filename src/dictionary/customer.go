@@ -15,11 +15,11 @@ type CustomerDetail struct {
 	Id					int64		`json:"id"`
 	NIK					string	`json:"nik"`
 	LegalName		string	`json:"legalname"`
-	PlaceBirth	string 	`json:"placeBirth"`
-	DateBirth		string	`json:"dateBirth"`
+	PlaceBirth	string 	`json:"place_of_birth"`
+	DateBirth		string	`json:"date_of_birth"`
 	Salary			int64		`json:"salary"`
-	KtpImg			string  `json:"ktpImg"`
-	SelfieImg		string	`json:"selfieImg"`
+	KtpImg			string  `json:"ktp_img"`
+	SelfieImg		string	`json:"selfie_img"`
 }
 
 func (customer *Customer) HashPassword(password string) error {

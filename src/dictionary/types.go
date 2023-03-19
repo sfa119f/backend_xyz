@@ -6,6 +6,7 @@ const (
 	NotFoundError				= "not found"
 	InvalidParamError		= "invalid parameter"
 	InvalidRequestError	= "invalid request"
+	UnauthorizedError		= "unauthorized"
 )
 
 type APIResponse struct {

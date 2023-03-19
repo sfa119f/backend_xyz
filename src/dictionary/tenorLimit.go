@@ -7,9 +7,9 @@ import (
 
 type TenorLimit struct {
 	Id					int64		`json:"id"`
-	CustomerId	int64		`json:"customerId"`
-	LimitValue	int64		`json:"limitValue"`
-	MonthTenor	int64		`json:"monthTenor"`
+	CustomerId	int64		`json:"customer_id"`
+	LimitValue	int64		`json:"limit_value"`
+	MonthTenor	int64		`json:"month_tenor"`
 }
 
 func (tL *TenorLimit) MakeLimit(salary int64) error {

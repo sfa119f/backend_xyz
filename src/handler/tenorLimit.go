@@ -28,3 +28,18 @@ func MakeTenorLimit(w http.ResponseWriter, r *http.Request, salary int64, month 
 	}
 	return true
 }
+
+func GetTenorByIdCust(w http.ResponseWriter, r *http.Request) {
+	custId := utils.GetIdCustomerInfoCtx(w, r)
+	if custId == 0 {
+		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		return
+	}
+
+	res, err := service.GetTenorByIdCust(custId)
+	if err != nil {
+		utils.JsonResp(w, 500, nil, err)
+		return
+	}
+	utils.JsonResp(w, 200, res, nil)
+}
