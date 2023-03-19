@@ -204,6 +204,14 @@ func InsertUpdateCstDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	countMakeTenorLimit := 0
+	for i := 1; i <= 4; i++ {
+		if ok := MakeTenorLimit(w, r, cstDetails.Salary, int64(i)); ok {
+			countMakeTenorLimit++
+		}
+	}
+
 	// Success
-	utils.JsonResp(w, 200, map[string]string{"message": "success"}, nil)
+	resMap := map[string]interface{}{"message": "success", "countMakeTenorLimit": countMakeTenorLimit}
+	utils.JsonResp(w, 200, resMap, nil)
 }
