@@ -13,15 +13,41 @@ func InsertCustomer(customer dictionary.Customer) error {
 	return err
 }
 
-func Login(email string) (dictionary.Customer, error) {
+func Login(id int64, email string) (dictionary.Customer, error) {
 	db := database.GetDB()
-	query := `select * from customers where email = $1`
+	
+	query := `
+		select * from customers 
+		where case 
+			when $1 = 0 then email = $2
+			else id = $1
+		end
+	`
 
 	res := dictionary.Customer{}
 	if err := 
-		db.QueryRow(query, email).Scan(&res.Id, &res.Fullname, &res.Email, &res.Pass);
+		db.QueryRow(query, id, email).Scan(&res.Id, &res.Fullname, &res.Email, &res.Pass);
 		err != nil {
 			return res, err
 		}
 	return res, nil
+}
+
+func UpdateCustomer(customer dictionary.Customer) error {
+	db := database.GetDB()
+
+	query := `
+		update customers set fullname = $2, email = $3, pass = $4
+		where id = $1 returning id
+	`
+
+	var id int64
+	if err := 
+		db.QueryRow(
+			query, customer.Id, customer.Fullname, customer.Email, customer.Pass,
+		).Scan(&id);
+		err != nil {
+			return err
+		}
+	return nil
 }
