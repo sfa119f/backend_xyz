@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"errors"
+	"strconv"
 
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 	"github.com/sfa119f/backend_xyz/src/service"
@@ -11,7 +12,11 @@ import (
 
 func MakeTenorLimit(w http.ResponseWriter, r *http.Request, salary int64, month int64) bool {
 	custId := utils.GetIdCustomerInfoCtx(w, r)
-	if custId == 0 || month < 0 || month > 12  {
+	if custId == 0 {
+		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		return false
+	}
+	if month < 0 || month > 12  {
 		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidRequestError))
 		return false
 	}
@@ -30,13 +35,22 @@ func MakeTenorLimit(w http.ResponseWriter, r *http.Request, salary int64, month 
 }
 
 func GetTenorByIdCust(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	strMonthTenor := query.Get("monthTenor")
+	if strMonthTenor == "" { strMonthTenor = "0" }
+	monthTenor, err := strconv.Atoi(strMonthTenor)
+	if err != nil {
+		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		return
+	}
+
 	custId := utils.GetIdCustomerInfoCtx(w, r)
 	if custId == 0 {
 		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
 		return
 	}
 
-	res, err := service.GetTenorByIdCust(custId)
+	res, err := service.GetTenorByIdCust(custId, int64(monthTenor))
 	if err != nil {
 		utils.JsonResp(w, 500, nil, err)
 		return

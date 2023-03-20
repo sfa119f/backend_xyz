@@ -128,8 +128,14 @@ func UpdateCstExceptPass(w http.ResponseWriter, r *http.Request) {
 func UpdateCustomer(
 	w http.ResponseWriter, r *http.Request, dataUpdate dictionary.Customer, oldPass string,
 ) {
-	dataUpdate.Id = utils.GetIdCustomerInfoCtx(w, r)
-	if dataUpdate.Id == 0 || oldPass == "" {
+	custId := utils.GetIdCustomerInfoCtx(w, r)
+	if custId == 0 {
+		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		return
+	}
+
+	dataUpdate.Id = custId
+	if oldPass == "" {
 		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidRequestError))
 		return
 	}
@@ -180,14 +186,20 @@ func UpdateCustomer(
 }
 
 func InsertUpdateCstDetails(w http.ResponseWriter, r *http.Request) {
+	custId := utils.GetIdCustomerInfoCtx(w, r)
+	if custId == 0 {
+		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		return
+	}
+
 	cstDetails := dictionary.CustomerDetail{}
 	if err := json.NewDecoder(r.Body).Decode(&cstDetails); err != nil {
 		utils.JsonResp(w, 500, nil, err)
 		return
 	}
-	cstDetails.Id = utils.GetIdCustomerInfoCtx(w, r)
+	cstDetails.Id = custId
 
-	if (cstDetails.Id == 0 || cstDetails.NIK == "" || cstDetails.LegalName == "" || 
+	if (cstDetails.NIK == "" || cstDetails.LegalName == "" || 
 		cstDetails.PlaceBirth == "" || cstDetails.DateBirth == "" || 
 		cstDetails.KtpImg == "" || cstDetails.SelfieImg == "" ){
 		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidRequestError))

@@ -21,14 +21,6 @@ func main() {
 	// init router
 	router := mux.NewRouter()
 
-	// routes
-	// router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	fmt.Fprintf(w, "Hello World!")
-	// }).Methods(http.MethodGet)
-	// router.HandleFunc("/api/customer", handler.InsertCustomer).Methods(http.MethodPost)
-	// router.HandleFunc("/api/login", handler.Login).Methods(http.MethodPost)
-	// router.HandleFunc("/api/customer", handler.UpdateCustomer).Methods(http.MethodPut).Use(utils.MiddlewareJWTAuthorization)
-
 	// route without middleware
 	r_wm := router.PathPrefix("/api").Subrouter()
 	r_wm.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -44,6 +36,7 @@ func main() {
 	r_um.HandleFunc("/customer/password", handler.UpdateCstPass).Methods(http.MethodPut)
 	r_um.HandleFunc("/customer/details", handler.InsertUpdateCstDetails).Methods(http.MethodPost)
 	r_um.HandleFunc("/tenorLimit", handler.GetTenorByIdCust).Methods(http.MethodGet)
+	r_um.HandleFunc("/transaction", handler.InsertTransaction).Methods(http.MethodPost)
 	
 	port :=  ":" + os.Getenv("XYZ_PORT")
 	server := new(http.Server)

@@ -19,9 +19,15 @@ func InsertUpdateTenor(tL dictionary.TenorLimit) error {
 	return err
 }
 
-func GetTenorByIdCust(custId int64) ([]map[string]int64, error) {
+func GetTenorByIdCust(custId int64, monthTenor int64) ([]map[string]int64, error) {
 	db := database.GetDB()
-	query := `select * from tenor_limit where customer_id = ` + strconv.Itoa(int(custId))
+
+	qMonthTenor := ``
+	if monthTenor != 0 {
+		qMonthTenor = ` and month_tenor = ` + strconv.Itoa(int(monthTenor))
+	}
+	query := 
+		`select * from tenor_limit where customer_id = ` + strconv.Itoa(int(custId)) + qMonthTenor
 
 	rows, err := db.Query(query)
 	if err != nil {
