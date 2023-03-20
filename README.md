@@ -35,6 +35,6 @@ air
   Menampilkan data transaksi oleh pengguna dengan parameter (otrMin, otrMax, month, year)
 
 ## Others
-- Anda dapat melihat keterangan pembuatan endpoint [disini](./doc/keterangan.txt
+- Anda dapat melihat keterangan pembuatan endpoint [disini](./doc/keterangan.txt)
 - Anda dapat melihat arsitektur pembuatan database [disini](./doc/relasi_xyz_db.png)
 - Anda dapat melihat rencana arsitektur aplikasi [disini](./doc/architectural_diagram.png)
