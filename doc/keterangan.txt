@@ -1,0 +1,9 @@
+Asumsi pembuatan endpoint:
+
+1. Selain di endpoint dengan awalan "./api/auth/..." perlu menggunakan token di authorization header dengan schema "Bearer"
+2. Setiap customer yang melakukan registrasi akun tidak dapat menghapus akun beserta data mereka
+3. Setiap token yang dibuat hanya berlaku untuk 10 menit dan setelah itu customer perlu login lagi untuk dibuatkan kembali tokennya
+4. Setiap customer pasti hanya memiliki limit tenor untuk 1-4 bulan saja yang dibuat dan diupdate secara otomatis ketika membuat atau mengupdate data detail customer berdasarkan "gaji" dan "lama tenor (bulan)"
+5. Setiap transaksi akan dicek apakah sudah melebihi limit tenornya yaitu "total OTR" berdasarkan "jumlah cicilan" = "lama tenor (bulan)"
+6. Setiap transaksi tidak memiliki "jumlah cicilan" lebih dari 4
+7. Setiap transaksi memiliki "admin fee" default 5000, "jumlah cicilan" default 1 (bulan), dan "jumlah bunga" default 8 (persen)
