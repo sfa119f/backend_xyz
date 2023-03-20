@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"errors"
 	"time"
+	"strconv"
 
 	"github.com/sfa119f/backend_xyz/src/dictionary"
 	"github.com/sfa119f/backend_xyz/src/service"
@@ -61,4 +62,55 @@ func InsertTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.JsonResp(w, 201, map[string]string{"message": "success"}, nil)
+}
+
+func GetTransactionByIdCust(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	strMonth := query.Get("month")
+	if strMonth == "" { strMonth = "0" }
+	month, err := strconv.Atoi(strMonth)
+	if err != nil {
+		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidParamError))
+		return
+	}
+
+	strYear := query.Get("year")
+	if strYear == "" { strYear = "0" }
+	year, err := strconv.Atoi(strYear)
+	if err != nil {
+		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidParamError))
+		return
+	}
+
+	strOtrMin := query.Get("otrMin")
+	if strOtrMin == "" { strOtrMin = "0" }
+	otrMin, err := strconv.Atoi(strOtrMin)
+	if err != nil {
+		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidParamError))
+		return
+	}
+
+	strOtrMax := query.Get("otrMax")
+	if strOtrMax == "" { strOtrMax = "0" }
+	otrMax, err := strconv.Atoi(strOtrMax)
+	if err != nil {
+		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidParamError))
+		return
+	}
+
+	custId := utils.GetIdCustomerInfoCtx(w, r)
+	if custId == 0 {
+		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		return
+	}
+
+	res, err := service.GetTransactionByIdCust(
+		custId, int64(month), int64(year), int64(otrMin), int64(otrMax),
+	)
+	if err != nil {
+		utils.JsonResp(w, 500, nil, err)
+		return
+	}
+	utils.JsonResp(w, 200, res, nil)
 }

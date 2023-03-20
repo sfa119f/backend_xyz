@@ -40,7 +40,7 @@ func GetTenorByIdCust(w http.ResponseWriter, r *http.Request) {
 	if strMonthTenor == "" { strMonthTenor = "0" }
 	monthTenor, err := strconv.Atoi(strMonthTenor)
 	if err != nil {
-		utils.JsonResp(w, 401, nil, errors.New(dictionary.UnauthorizedError))
+		utils.JsonResp(w, 400, nil, errors.New(dictionary.InvalidParamError))
 		return
 	}
 
