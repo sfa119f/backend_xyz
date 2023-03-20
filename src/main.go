@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/sfa119f/backend_xyz/src/database"
-	// "github.com/sfa119f/backend_xyz/src/dictionary"
 	"github.com/sfa119f/backend_xyz/src/handler"
 	"github.com/sfa119f/backend_xyz/src/utils"
 
@@ -22,10 +21,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// route without middleware
-	r_wm := router.PathPrefix("/api").Subrouter()
-	r_wm.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello World!")
-	}).Methods(http.MethodGet)
+	r_wm := router.PathPrefix("/api/auth").Subrouter()
 	r_wm.HandleFunc("/customer", handler.InsertCustomer).Methods(http.MethodPost)
 	r_wm.HandleFunc("/login", handler.Login).Methods(http.MethodPost)
 
